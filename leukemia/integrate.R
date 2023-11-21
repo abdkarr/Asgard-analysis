@@ -1,10 +1,7 @@
 library(here)
 library(Seurat)
 library(SeuratObject)
-
-library(devtools)
-
-load_all(here("..", "Asgard"))
+library(Asgard)
 
 OUTPUT_DIR <- here("leukemia", "outputs")
 
@@ -25,6 +22,7 @@ for (i in seq_along(sobjects)) {
 anchors <- FindIntegrationAnchors(sobjects, anchor.features = 2000, dims = 1:15)
 integrated <- IntegrateData(anchors, dims = 1:15)
 
+# PCA
 if (do_cell_cycle_regression) {
     integrated <- CellCycleScoring(integrated, s.features = cc.genes$s.genes, 
                                    g2m.features = cc.genes$g2m.genes, 
@@ -36,7 +34,6 @@ if (do_cell_cycle_regression) {
     integrated <- ScaleData(integrated, verbose = FALSE)
 }
 
-# PCA
 integrated <- Seurat::RunPCA(integrated, npcs = 15, verbose = FALSE)
 
 # Save PCA: In the downstream analysis, we only need PCA of integrated data
